@@ -7,8 +7,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/golangcollege/sessions"
 	"vincellauderes.net/snippetbox/pkg/models/mysql"
 )
 
@@ -19,6 +21,7 @@ type Config struct {
 	Addr      string
 	StaticDir string
 	Dsn       string
+	Secret    string
 }
 
 // Define an application struct to hold the application wide dependencies for the web application
@@ -27,6 +30,7 @@ type Config struct {
 type application struct {
 	errorLog      *log.Logger
 	infoLog       *log.Logger
+	sessions      *sessions.Session
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
 }
@@ -40,6 +44,10 @@ func main() {
 
 	// This is a pointer, we need to dereference the pointer before using it...
 	flag.StringVar(&cfg.Addr, "addr", ":4000", "HTTP network address")
+
+	// Define a new command-line flag for the session secret (a random key which will be used to encrypt and authenticate session cookies).
+	// It should be bytes long.
+	flag.StringVar(&cfg.Secret, "secret", "s6Ndh+pPbnzHbS*+9Pk8qGWhTzbpa@ge", "Session Secret")
 
 	// Importantly, we use the flag.Parse function to parse the command line
 	flag.Parse()
@@ -67,10 +75,17 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	// Use the sessions.New() function to initialize a new session manager,
+	// passing in the secret key as the parameter. Then we configure it so
+	/// sessions always expires after 12 hours.
+	session := sessions.New([]byte(cfg.Secret))
+	session.Lifetime = 12 * time.Hour
+
 	// Initialize a new instance of application containing the dependencies...
 	app := application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
+		sessions:      session,
 		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: templateCache,
 	}

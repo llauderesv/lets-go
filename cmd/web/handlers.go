@@ -53,7 +53,9 @@ func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	// Write the snippet data as a plain-text HTTP response body.
 	// fmt.Fprintf(w, "%v", s)
 
-	app.render(w, r, "show.page.tmpl", &templateData{Snippet: s})
+	app.render(w, r, "show.page.tmpl", &templateData{
+		Snippet: s, 
+	})
 	// files := []string{
 	// 	"./ui/html/show.page.tmpl",
 	// 	"./ui/html/base.layout.tmpl",
@@ -143,6 +145,13 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 		return
 	}
+
+	// Use the Put() method to add a string value ("Your snippet was saved
+	// successfully!") and the corresponding key ("flash") to the session
+	// data. Note that if there's no existing session for the current user
+	// (or their session has expired) then a new, empty, session for them
+	// will automatically be created by the session middleware.
+	app.sessions.Put(r, "flash", "Snippet Successfully created!")
 
 	app.infoLog.Println(id)
 
