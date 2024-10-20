@@ -52,6 +52,13 @@ func (app *application) routes() http.Handler {
 	mux.Post("/snippets/create", dynamicMiddleWare.ThenFunc(app.createSnippet))
 	mux.Get("/snippets/:id", dynamicMiddleWare.ThenFunc(app.showSnippet))
 
+	// Add the five new routes.
+	mux.Get("/user/signup", dynamicMiddleWare.ThenFunc(app.signupUserForm))
+	mux.Post("/user/signup", dynamicMiddleWare.ThenFunc(app.signupUser))
+	mux.Get("/user/login", dynamicMiddleWare.ThenFunc(app.loginUserForm))
+	mux.Post("/user/login", dynamicMiddleWare.ThenFunc(app.loginUser))
+	mux.Post("/user/logout", dynamicMiddleWare.ThenFunc(app.logoutUser))
+
 	// Create a file server which serves files out of the "./ui/static" directory
 	// Note that the path given to the http.Dir function is relative to the provider
 	// directory root

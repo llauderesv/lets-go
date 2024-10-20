@@ -1,4 +1,7 @@
 -- Create a new UTF-8 `snippetbox` database.
+
+-- User root p password default
+
 CREATE DATABASE snippetbox CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Switch to using the `snippetbox` database.
@@ -45,3 +48,14 @@ CREATE USER 'web'@'localhost';
 GRANT SELECT, INSERT ON snippetbox.* TO 'web'@'localhost';
 
 ALTER USER 'web'@'localhost' IDENTIFIED by 'pass';
+
+
+CREATE TABLE users (
+    id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    hashed_password CHAR(60) NOT NULL,
+    created DATETIME NOT NULL
+);
+
+ALTER TABLE users ADD CONSTRAINT users_uc_email UNIQUE (email);

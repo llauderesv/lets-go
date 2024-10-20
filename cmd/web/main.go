@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"database/sql"
 	"flag"
 	"html/template"
@@ -33,6 +34,7 @@ type application struct {
 	sessions      *sessions.Session
 	snippets      *mysql.SnippetModel
 	templateCache map[string]*template.Template
+	userss        *mysql.UserModel
 }
 
 func main() {
@@ -88,6 +90,12 @@ func main() {
 		sessions:      session,
 		snippets:      &mysql.SnippetModel{DB: db},
 		templateCache: templateCache,
+		userss:        &mysql.UserModel{DB: db},
+	}
+
+	tlsConfig := &tls.Config{
+		PreferServerCipherSuites: true,
+		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP256},
 	}
 
 	// Initialize a new http.Server struct. We set the Addr and Handler fields
@@ -95,13 +103,18 @@ func main() {
 	// the ErrorLog field so that the server now uses the custom errorLog
 	// We used cause we wanted to inject the ErrorLog into http Server
 	srv := &http.Server{
-		Addr:     cfg.Addr,
-		ErrorLog: errorLog,
-		Handler:  app.routes(),
+		Addr:         cfg.Addr,
+		ErrorLog:     errorLog,
+		Handler:      app.routes(),
+		TLSConfig:    tlsConfig,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
 	}
 
 	infoLog.Printf("Staring server on %s", cfg.Addr)
-	err = srv.ListenAndServe()
+	err = srv.ListenAndServeTLS("./tls/cert.pem", "./tls/key.pem")
+	// err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
 
