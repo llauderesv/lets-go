@@ -46,10 +46,10 @@ func (app *application) routes() http.Handler {
 	mux := pat.New()
 	mux.Get("/", dynamicMiddleWare.ThenFunc(app.home))
 	mux.Get("/testroute", dynamicMiddleWare.ThenFunc(t.ServeHTTP))
-	mux.Get("/snippets/create", dynamicMiddleWare.ThenFunc(app.createSnippetForm))
+	mux.Get("/snippets/create", dynamicMiddleWare.Append(app.requireAuthenticatedUser).ThenFunc(app.createSnippetForm))
 	mux.Get("/users", dynamicMiddleWare.ThenFunc(app.users))
 	// mux.Get("/snippets/create", dynamicMiddleWare.ThenFunc(app.users))
-	mux.Post("/snippets/create", dynamicMiddleWare.ThenFunc(app.createSnippet))
+	mux.Post("/snippets/create", dynamicMiddleWare.Append(app.requireAuthenticatedUser).ThenFunc(app.createSnippet))
 	mux.Get("/snippets/:id", dynamicMiddleWare.ThenFunc(app.showSnippet))
 
 	// Add the five new routes.

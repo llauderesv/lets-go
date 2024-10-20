@@ -11,11 +11,12 @@ import (
 
 // Add FormData and FormErrors fields to the templateData struct.
 type templateData struct {
-	CurrentYear int
-	Form        *forms.Form
-	Snippet     *models.Snippet
-	Snippets    []*models.Snippet
-	Flash       string
+	AuthenticatedUser int
+	CurrentYear       int
+	Form              *forms.Form
+	Snippet           *models.Snippet
+	Snippets          []*models.Snippet
+	Flash             string
 }
 
 // Create a humanDate function which returns a nicely formatted string

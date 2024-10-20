@@ -6,6 +6,8 @@ type Point struct {
 	x *int
 }
 
+type contextKey string
+
 func main() {
 	var str string = "Hello World"
 	var i *int
@@ -18,4 +20,6 @@ func main() {
 
 	fmt.Println(&str)  // Get the memory address
 	fmt.Println(*str2) // Get the actual value by dereferencing the pointer
+
+	fmt.Println(contextKey(1))
 }
